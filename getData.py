@@ -8,11 +8,15 @@ import lxml
 import ssl
 from lxml import etree
 from datetime import datetime
+import time
+import MySQLdb
 
 # just beacuse we don't have many events
 # this code can be deleted then
 
-firebase = firebase.FirebaseApplication('https://esnurbino.firebaseio.com/', authentication = None)
+conn = MySQLdb.connect(host='127.0.0.1',user='root',passwd='',db='esnurbino')
+cur = conn.cursor()
+
 event = {}
 eventsArray = []
 try:
@@ -36,25 +40,24 @@ for eventes in et:
     
         event['nid'] = eventes[15].text
         event['title'] = eventes[0].text.split(">")[1].split("<")[0]
-        result = firebase.put('/events/' + event['nid'], 'name' , event['title'])
         event['startDate'] = eventes[1].text.split("T")[0]
-        result = firebase.put('/events/' + event['nid'], 'startDate' , event['startDate'])
         event['endDate'] = eventes[2].text.split("T")[0]
-        if event['startDate'] != event['endDate'] :    
-            result = firebase.put('/events/' + event['nid'], 'endDate' , event['endDate']) 
+        if event['startDate'] == event['endDate'] :  
+            event['endDate'] = NULL            
         #event['picture'] = eventes[3]
-        #result = firebase.put('/events/' + event['nid'], 'picture' , event['picture'])
         event['place'] = eventes[6].text
-        result = firebase.put('/events/' + event['nid'], 'place' , event['place'])
         event['prize'] = eventes[7].text
-        result = firebase.put('/events/' + event['nid'], 'prize' , event['prize'])
         event['meetingPoint'] = eventes[9].text
-        result = firebase.put('/events/' + event['nid'], 'meetingPoint' , event['meetingPoint'])
-        #event['country'] = eventes[1][13].text
-        #result = firebase.put('/events/' + eventes[0].text, 'country' , event['country'])
-        #event['date'], event['time'] = (eventes[3].text).split('-')
-        #result = firebase.put('/events/' + eventes[0].text, 'date' , event['date'])
-        #result = firebase.put('/events/' + eventes[0].text, 'time' , event['time'])    
-        eventsArray.append(event)
+        try:
+            cur.execute('USE esnurbino')
+            sql = "INSERT INTO events (name, startDate, endDate, place, prize, meetingPoint) VALUES (%s, %s, %s, %s, %d, %s)"
+            val = ( event['title']  , event['startDate'] , event['endDate'] , event['place'] , event['prize'] , event['meetingPoint'])
+            cur.execute(sql, val)
+            
+        except:
+            print("ERRORE NELL INSERIMENTO DEI DATI")
+        time.sleep(1)
+        conn.close()
+        
+        # eventsArray.append(event)
     
-print(eventsArray) 
