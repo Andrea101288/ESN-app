@@ -18,7 +18,9 @@ CREATE TABLE Events(
 
 name varchar(20) PRIMARY KEY,
 startDate varchar(20) NOT NULL,
+startTime varchar(20) NOT NULL,
 endDate varchar(20) ,
+EndTime varchar(20) ,
 place varchar(20),
 prize int(100),
 meetingPoint varchar(20)
