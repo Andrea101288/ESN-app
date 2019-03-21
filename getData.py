@@ -12,7 +12,7 @@ from datetime import datetime
 # just beacuse we don't have many events
 # this code can be deleted then
 
-firebase = firebase.FirebaseApplication('https://internetservicesandapplication.firebaseio.com/', authentication = None)
+firebase = firebase.FirebaseApplication('https://esnurbino.firebaseio.com/', authentication = None)
 event = {}
 eventsArray = []
 try:
