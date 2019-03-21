@@ -24,5 +24,3 @@ prize int(100),
 meetingPoint varchar(20)
 
 ) Engine = InnoDB;
-						   
-
