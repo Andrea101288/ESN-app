@@ -5,9 +5,8 @@ USE ESNurbino;
 
 CREATE TABLE ErasmusUser(
 
-username varchar(15) PRIMARY KEY,
+email varchar(50) PRIMARY KEY,
 password varchar(20) NOT NULL,
-email varchar(200) NOT NULL,
 nome varchar(20) NOT NULL,
 cognome varchar(20) NOT NULL,
 data_nascita varchar(20) NOT NULL
