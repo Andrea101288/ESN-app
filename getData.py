@@ -12,8 +12,8 @@ import time
 import MySQLdb
 
 
-# conn = MySQLdb.connect(host='localhost',user='root',passwd='Jago2009',db='esnurbino')
-# cur = conn.cursor()
+conn = MySQLdb.connect(host='localhost',user='root',passwd='Jago2009',db='esnurbino')
+cur = conn.cursor()
 
 event = {}
 eventsArray = []
@@ -35,34 +35,36 @@ for eventes in et:
     
     
     if datetime_object > datetime.now():
-    
-        event['nid'] = eventes[15].text
-        event['title'] = eventes[0].text.split(">")[1].split("<")[0]
-        event['endDate'] = eventes[2].text.split("T")[0]
-        event['startTime'] = eventes[1].text.split("T")[1].split("+")[0]
-        event['endTime'] = eventes[2].text.split("T")[1].split("+")[0]
+        
+        nid = event['nid'] = eventes[15].text
+        name = event['title'] = eventes[0].text.split(">")[1].split("<")[0]
+        endDate = event['endDate'] = eventes[2].text.split("T")[0]
+        startTime = event['startTime'] = eventes[1].text.split("T")[1].split("+")[0]
+        endTime = event['endTime'] = eventes[2].text.split("T")[1].split("+")[0]
         
         if event['startDate'] == event['endDate'] :  
-            event['endDate'] = NULL            
+            endDate = NULL            
         #event['picture'] = eventes[3]
-        event['place'] = eventes[6].text
+        place = event['place'] = eventes[6].text
         if event['place'] == "" :
-            event['place'] = NULL
-        event['prize'] = eventes[7].text
+            place = NULL
+        prize = event['prize'] = eventes[7].text
         if event['prize'] == "" :
-            event['prize'] = NULL
-        event['meetingPoint'] = eventes[9].text
+            prize = NULL
+        meetingPoint = event['meetingPoint'] = eventes[9].text
         if event['meetingPoint'] == "" :
-            event['meetingPoint'] = NULL
-        #try:
-        #    cur.execute('USE esnurbino')
-        #    cur.execute('INSERT INTO events(name, startDate, endDate, place, prize, meetingPoint ) VALUES (?,?,?,?,?,?)'.format(event['title'], event['startDate'], event['endDate'], event['place'], event['prize'], event['meetingPoint']))
-        #    conn.commit()
+            meetingPoint = NULL
+        try:
+            cur.execute('USE esnurbino')
+            sql = "INSERT INTO events ( name , startDate, startTime, endDate, endTime, place, prize, meetingPoint ) VALUES({},{},{},{},{},{},{},{})"
+            val = (name , startDate, startTime, endDate, endTime, place, prize, meetingPoint) 
+            cur.execute(sql, val)
+            conn.commit()
             
-        #except:
-        #    print("ERRORE NELL INSERIMENTO DEI DATI")
-        #time.sleep(1)
-        #conn.close()
+        except:
+            print("ERRORE NELL INSERIMENTO DEI DATI")
+        time.sleep(1)
+        conn.close()
         
         # eventsArray.append(event)
     
