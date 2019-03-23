@@ -1,90 +1,136 @@
-
-from bs4 import BeautifulSoup
-import json
-from firebase import firebase
-import requests
-import xml.etree.ElementTree as ET
-import lxml
-import ssl
-from lxml import etree
 from datetime import datetime
-import time
+import xml.etree.ElementTree as ET
+
+import requests
 import MySQLdb
 
-myHost='localhost'
-myUser='root'
-myPasswd='Jago2009'
-myDb='esnurbino'
-myCharSet = 'utf8'
+import settings
+# from settings import host, username, passwd, database, charset
 
-def insertEventDb(sqlHost, sqlUser, sqlPasswd, sqlDb, eventId, eventName, eventStartDate, eventStartTime, eventEndDate, eventEndTime, eventPlace, eventPrize, eventMeetingPoint):
-    
-    conn = MySQLdb.connect(host=sqlHost,user=sqlUser,passwd=sqlPasswd,db=sqlDb,charset=myCharSet)
-    cur = conn.cursor()
-    
-    try:
-        cur.execute("USE "+ sqlDb)
-        sql = "INSERT INTO events VALUES (" + eventId  + "," + eventName + "," + eventStartDate + "," + eventStartTime + "," + eventEndDate + "," + eventEndTime + "," + eventPlace + "," + eventPrize + "," + eventMeetingPoint + ");"
-        cur.execute(sql)
-        conn.commit()
-        conn.close()
-    except:
-        print("ERRORE NELL INSERIMENTO DEI DATI")
-        conn.close()
-        
+
+class Manager:
+    """This class manages all the connection and operations on the ESN database"""
+
+    def __init__(self, host, username, password, database, charset="UTF8"):
+        """Constructor function"""
+        # Get credentials to enstablish connection
+        self.host = host
+        self.username = username
+        self.password = password
+        self.database = database
+        self.charset = charset
+
+        # Database stuff
+        self.connection = None
+        self.cursor = None
+
+    def connect(self):
+        """Connect to database"""
+        self.connection = MySQLdb.connect(self.host,
+                                          self.username,
+                                          self.password,
+                                          self.database,
+                                          charset=self.charset)
+        self.cursor = self.connection.cursor()
+
+    def close(self):
+        """Closes the connection to the database"""
+        self.connection.close()
+
+    def insert_event(self, nid, name, start_date, start_time, end_date, end_time, place, price, meeting_point):
+        """Insert events in the database"""
+        try:
+            # Prepare query
+            query = "INSERT INTO event VALUES({0}, '{1}', '{2}', '{3}',\
+                    '{4}', '{5}', '{6}', '{7}', '{8}')".format(nid,
+                                                               name,
+                                                               start_date,
+                                                               start_time,
+                                                               end_date,
+                                                               end_time,
+                                                               place,
+                                                               price,
+                                                               meeting_point)
+            # Execute query
+            self.cursor.execute(query)
+            self.connection.commit()
+
+        except MySQLdb._exceptions.IntegrityError:
+            print("Entry '{0}' exists. Skipping".format(nid))
+        except MySQLdb._exceptions.ProgrammingError:
+            print("Error! Probably a table don't exists.")
+            raise MySQLdb._exceptions.ProgrammingError()
+        except MySQLdb._exceptions.DataError:
+            print("Error! Probably data too long for db limits.")
+            raise MySQLdb._exceptions.DataError()
+
+
+# Create a new instance of db manager
+manager = Manager(settings.host,
+                  settings.username,
+                  settings.passwd,
+                  settings.database,
+                  settings.charset)
+manager.connect()
+
+# Request events XML
 try:
-    result = requests.get("https://www.esnurbino.it/api/v1/events.xml", verify = False)
+    result = requests.get("https://www.esnurbino.it/api/v1/events.xml")
 except:
-    print("getRequest Error!")   
-    
-et = ET.fromstring(result.text)
-        
-for eventes in et:
-    event = {}
-    startDate = event['startDate'] = eventes[1].text.split("T")[0]     
-    startDateY = event['startDate'].split("-")[0]
-    startDateM = event['startDate'].split("-")[1]
-    startDateD = event['startDate'].split("-")[2]
-    
-    datetime_object = datetime( int(startDateY), int(startDateM), int(startDateD)) 
-    
-    
-    #if datetime_object > datetime.now():
-        
-    nid = event['nid'] = eventes[15].text
-    name = event['title'] = eventes[0].text.split(">")[1].split("<")[0]
-    endDate = event['endDate'] = eventes[2].text.split("T")[0]
-    startTime = event['startTime'] = eventes[1].text.split("T")[1].split("+")[0]
-    endTime = event['endTime'] = eventes[2].text.split("T")[1].split("+")[0]
-    place = event['place'] = eventes[6].text
-    prize = event['prize'] = eventes[7].text
-    meetingPoint = event['meetingPoint'] = eventes[9].text
-    
-    nid = "'" + str(int(nid)) + "'"
-    name = "'" + name + "'"
-    startDate = "'" + startDate + "'"
-    startTime = "'" + startTime + "'"
-    endTime = "'" + endTime + "'"        
-    
-    if event['startDate'] == event['endDate'] :  
-        endDate = "NULL" 
-    else:
-        endDate = "'" + endDate + "'"
-        
-    if event['place'] == None :
+    print("Request Error!")
+    raise ConnectionError()
+
+# Parse the events
+events = ET.fromstring(result.text)
+
+# Loop through events
+for event in events:
+    # Extract start date
+    start_date = event[1].text.split("T")[0]
+
+    # Compute the date as a comparable object
+    startDateY = int(start_date.split("-")[0])
+    startDateM = int(start_date.split("-")[1])
+    startDateD = int(start_date.split("-")[2])
+    datetime_object = datetime(startDateY, startDateM, startDateD)
+
+    # Check if event is not alredy finished
+    # if datetime_object > datetime.now():
+
+    # Extract all the interesting infos
+    nid = event[15].text
+    name = event[0].text.split(">")[1].split("<")[0]
+    end_date = event[2].text.split("T")[0]
+    start_time = event[1].text.split("T")[1].split("+")[0]
+    end_time = event[2].text.split("T")[1].split("+")[0]
+    place = event[6].text
+    price = event[7].text
+    meeting_point = event[9].text
+
+    # Check if some of the field are empty
+    # In case they are replace them with NULL
+    if start_date == end_date:
+        end_date = "NULL"
+
+    if place == None:
         place = "NULL"
-    else:  
-        place = "'" + place + "'"
-    if event['prize'] == None :
-        prize = "NULL"
-    else:
-        prize = "'" + str(prize) + "'"
-    if event['meetingPoint'] == None :
-        meetingPoint = "NULL"
-    else:
-        meetingPoint = "'" + meetingPoint + "'"
-    
-    insertEventDb(myHost, myUser, myPasswd, myDb, nid, name, startDate, startTime, endDate, endTime, place, prize, meetingPoint)
-   
-    
-    
+
+    if price == None:
+        price = "NULL"
+
+    if meeting_point == None:
+        meeting_point = "NULL"
+
+    # Insert the new event in the database
+    manager.insert_event(nid,
+                         name,
+                         start_date,
+                         start_time,
+                         end_date,
+                         end_time,
+                         place,
+                         price,
+                         meeting_point)
+
+# Close connection to the database
+manager.close()
