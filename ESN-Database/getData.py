@@ -2,10 +2,9 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 
 import requests
-import MySQLdb
+import mysql.connector as mysql
 
 import settings
-# from settings import host, username, passwd, database, charset
 
 
 class Manager:
@@ -26,11 +25,10 @@ class Manager:
 
     def connect(self):
         """Connect to database"""
-        self.connection = MySQLdb.connect(self.host,
-                                          self.username,
-                                          self.password,
-                                          self.database,
-                                          charset=self.charset)
+        self.connection = mysql.connect(host=self.host,
+                                        user=self.username,
+                                        password=self.password,
+                                        database=self.database)
         self.cursor = self.connection.cursor()
 
     def close(self):
@@ -55,14 +53,12 @@ class Manager:
             self.cursor.execute(query)
             self.connection.commit()
 
-        except MySQLdb._exceptions.IntegrityError:
-            print("Entry '{0}' exists. Skipping".format(nid))
-        except MySQLdb._exceptions.ProgrammingError:
-            print("Error! Probably a table don't exists.")
-            raise MySQLdb._exceptions.ProgrammingError()
-        except MySQLdb._exceptions.DataError:
-            print("Error! Probably data too long for db limits.")
-            raise MySQLdb._exceptions.DataError()
+        except mysql.Error as e:
+            if e.errno == 1062:
+                print("Entry '{0}' exists. Skipping".format(nid))
+            else:
+                print("Unknown error! Exiting...")
+                raise e
 
 
 # Create a new instance of db manager
