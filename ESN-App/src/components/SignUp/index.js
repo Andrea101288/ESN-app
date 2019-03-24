@@ -3,11 +3,6 @@ import { StyleSheet, Text, View, TextInput, Alert, TouchableOpacity} from 'react
 import * as firebase from "firebase";
 import DatePicker from 'react-native-datepicker';
 
-let mysql = require('mysql');
-let express = require('express');
-let session = require('express-session');
-let bodyParser = require('body-parser');
-
 export default class SignUp extends React.Component {
 
     constructor(props) {
@@ -27,7 +22,6 @@ export default class SignUp extends React.Component {
 
     async Signup() {
         let data = {'name': this.state.name, 'surname': this.state.surname, 'birth_date': this.state.date, 'email': this.state.email}
-
         try {
             await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
             await firebase.database().ref('users/').push(data)
