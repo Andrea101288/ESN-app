@@ -1,26 +1,12 @@
-import React from 'react';
 import {createStackNavigator} from 'react-navigation';
-import Login from './src/components/Login';
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
 import SignUp from './src/components/SignUp';
-import Firebase from './src/api';
-import MainView from './src/components/MainView';
-import EventInfo from './src/components/EventInfo';
-import Events from './src/components/Events';
-import BookedEvents from './src/components/BookedEvents';
-import DeleteAccount from './src/components/DeleteAccount';
-import ChangePassword from './src/components/ChangePassword';
-import RecoveryPassword from './src/components/RecoveryPassword';
-
-import Logout from './src/components/Logout';
-
-import Maps from './src/components/Maps';
-import * as firebase from 'firebase';
 
 export default class App extends React.Component {
-
     constructor(props) {
         super(props)
-        Firebase.init()
+
         this.state = {
             initialView: null,
             userLoaded: false
@@ -30,13 +16,15 @@ export default class App extends React.Component {
     }
 
     getInitialView() {
-        firebase.auth().onAuthStateChanged((user) => {
+        initialView = 'Login'
+
+        /* firebase.auth().onAuthStateChanged((user) => {
             let initialView = user ? 'MainView' : 'Login'
             this.setState({
                 userLoaded: true,
                 initialView
             })
-        })
+        })*/
     }
 
     render() {
@@ -45,28 +33,23 @@ export default class App extends React.Component {
                 <AppStackNavigator navigation={this.props.navigation}/>
             );
         }
-
         else {
             return null
         }
-
-  }
+    }
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
 const AppStackNavigator = createStackNavigator({
-    Login: Login,
+    //Login: Login,
     SignUp: SignUp,
-    MainView: MainView,
-    Events: Events,
-    EventInfo: EventInfo,
-    Maps: Maps,
-    BookedEvents: BookedEvents,
-    DeleteAccount: DeleteAccount,
-    ChangePassword: ChangePassword,
-    Logout: Logout,
-    RecoveryPassword: RecoveryPassword
-
-
+    //MainView: MainView,
 })
-
-

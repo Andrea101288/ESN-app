@@ -1,33 +1,29 @@
 {
   "expo": {
-    "name": "ESN",
-    "description": "This project is really great.",
-    "slug": "ESN",
+    "name": "ESN-App",
+    "slug": "ESN-App",
     "privacy": "public",
-    "sdkVersion": "31.0.0",
-    "platforms": ["ios", "android"],
+    "sdkVersion": "32.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/img/esn.png",
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "bundleIdentifier": "com.esn.esn",
-      "supportsTablet": true
-
-    },
-    "android": {
-      "package": "com.esn.esn"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
       "**/*"
-    ]
-
+    ],
+    "ios": {
+      "supportsTablet": true
+    }
   }
 }
