@@ -1,5 +1,6 @@
 import mysql.connector as mysql
 
+
 class Manager:
     """This class manages all the connection and operations on the ESN database"""
 
@@ -26,6 +27,7 @@ class Manager:
 
     def close(self):
         """Closes the connection to the database"""
+        self.cursor.close()
         self.connection.close()
 
     def insert_event(self, nid, name, start_date, start_time, end_date, end_time, place, price, meeting_point):
