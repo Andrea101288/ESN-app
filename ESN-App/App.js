@@ -2,6 +2,7 @@ import {createStackNavigator} from 'react-navigation';
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import SignUp from './src/components/SignUp';
+import Login from './src/components/Login';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
 });
 
 const AppStackNavigator = createStackNavigator({
-    //Login: Login,
+    Login: Login,
     SignUp: SignUp,
     //MainView: MainView,
 })
