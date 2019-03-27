@@ -76,35 +76,34 @@ class Manager:
                 print("Unknown error! Exiting...")
                 raise e
 
-    def login_user(self, email, password):
+    def get_password_hash(self, email):
         """Check credentials in the database and return result"""
         # Prepare query
-        query = "SELECT true FROM erasmusUser WHERE\
-                 email='{0}' and password='{1}'".format(email, password)
+        query = "SELECT password FROM erasmusUser WHERE email='{0}'".format(email)
 
         # Execute query
         self.cursor.execute(query)
 
         # Check result
-        for _ in self.cursor:
-            return True
+        for password_hash in self.cursor:
+            return password_hash[0]
 
         # User not found or wrong password
-        return False
+        return None
 
     def get_events(self, offset=0, limit=10):
         """Return last 'limit' events, eventually with an offset"""
         # Return value
-        rv = {}
+        rv = []
 
         # Prepare query
-        query = "SELECT * FROM event LIMIT {0}, {1}".format(offset*10, limit)
+        query = "SELECT * FROM event ORDER BY startdate DESC LIMIT {0}, {1}".format(offset, limit)
 
         # Execute query
         self.cursor.execute(query)
 
         # Check result
         for event in self.cursor:
-            print(event)
+            rv.append(event)
 
         return rv

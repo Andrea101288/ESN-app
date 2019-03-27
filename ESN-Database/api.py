@@ -12,17 +12,17 @@ class SignUp(Resource):
     """Manage signup process"""
 
     def post(self):
+        # Parse JSON data
+        req = json.loads(request.data.decode('UTF-8'))
+
+        # Get data from request body
+        email = req['email']
+        password = req['password']
+        name = req['name']
+        surname = req['surname']
+        birthdate = req['birthdate']
+
         try:
-            # Parse JSON data
-            req = json.loads(request.data.decode('UTF-8'))
-
-            # Get data from request body
-            email = req['email']
-            password = req['password']
-            name = req['name']
-            surname = req['surname']
-            birthdate = req['birthdate']
-
             # Insert new user
             manager.insert_user(email,
                                 password,
@@ -44,27 +44,50 @@ class Login(Resource):
 
         # Get data from request body
         email = req['email']
-        password = req['password']
 
-        # Check if user exists and password is correct
-        if manager.login_user(email, password):
-            return {"status": 200, "login": "Successful"}, 200
+        # Get hash from DB
+        password_hash = manager.get_password_hash(email)
+
+        # Check if user exists
+        if password_hash is not None:
+            return {"status": 200, "hash": password_hash}, 200
         else:
-            return {"status": 401, "error": "Wrong email or password"}, 401
+            return {"status": 401, "error": "Wrong email"}, 401
 
 
 class Events(Resource):
     """Manages events requests"""
 
-    def get(self):
-        pass
-    
+    def get(self, offset=0, limit=10):
+        # Return value
+        rv = []
+
+        # Get events from DB
+        events = manager.get_events(offset, limit)
+
+        for event in events:
+            tmp_event = {
+                'nid': event[0],
+                'name': event[1],
+                'startDate': event[2],
+                'startTime': event[3],
+                'endDate': event[4],
+                'endTime': event[5],
+                'place': event[6],
+                'price': event[7],
+                'meetingPoint': event[8]
+            }
+
+            rv.append(tmp_event)
+
+        return {"status": 200, "events": rv}, 200
+
 
 # Init flask
 app = Flask(__name__)
 api = Api(app)
 
-PORT = 9543
+PORT = 8080
 
 # Create new db manager
 manager = Manager(settings.host,
@@ -76,6 +99,10 @@ manager = Manager(settings.host,
 # Routes configuration
 api.add_resource(SignUp, '/signup/')
 api.add_resource(Login, '/login/')
+api.add_resource(Events,
+                 '/events/',
+                 '/events/<offset>/',
+                 '/events/<offset>/<limit>/')
 
 
 if __name__ == '__main__':
