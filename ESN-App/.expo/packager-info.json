@@ -1,8 +1,9 @@
 {
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 11228,
+  "packagerPid": 10128,
   "expoServerNgrokUrl": "https://up-5n3.anonymous.esn-app.exp.direct",
   "packagerNgrokUrl": "https://packager.up-5n3.anonymous.esn-app.exp.direct",
-  "ngrokPid": 2384
+  "ngrokPid": 13336,
+  "devToolsPort": 19002
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import {StyleSheet, Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
 import DatePicker from 'react-native-datepicker';
-
+import bcrypt from 'react-native-bcrypt'
+import isaac from 'isaac';
 export default class SignUp extends React.Component {
 
     constructor(props) {
@@ -22,8 +23,14 @@ export default class SignUp extends React.Component {
 
     async Signup() {
 
+        bcrypt.setRandomFallback((len) => {
+            const buf = new Uint8Array(len);
+            return buf.map(() => Math.floor(isaac.random() * 256));
+        });
+        let salt = bcrypt.genSaltSync(10);
+        let hash = bcrypt.hashSync(this.state.password, salt);
+        let passwordHash = hash;
         try {
-
             fetch("http://51.15.222.184:8080/signup/", {
 
                 method: 'POST',
@@ -33,7 +40,7 @@ export default class SignUp extends React.Component {
                 },
                 body: JSON.stringify({
                     email: this.state.email,
-                    password: this.state.password,
+                    password: passwordHash,
                     name: this.state.name,
                     surname: this.state.surname,
                     birthdate: this.state.date

@@ -1,5 +1,9 @@
 import React from 'react';
 import {StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert} from 'react-native';
+import bcrypt from 'react-native-bcrypt'
+
+
+/* import Logout from '../Logout'; */
 
 export default class Login extends React.Component {
 
@@ -16,18 +20,44 @@ export default class Login extends React.Component {
         }
         this.Login = this.Login.bind(this)
         this.onButtonPressed = this.onButtonPressed.bind(this)
+        this.auth = false;
     };
 
     componentDidMount() {
-
-        this.props.navigation.navigate('Login')
-
+        if(this.auth)
+            this.props.navigation.navigate(this.auth ? 'MainView' : 'Login')
     }
 
     async Login() {
         try {
-            /* await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password) */
-            this.props.navigation.navigate('MainView')
+
+            fetch("http://51.15.222.184:8080/login/" , {
+
+                method: 'POST',
+                body: JSON.stringify( {
+                    email: this.state.email
+                })
+
+            })
+            .then((response) => response.json())
+            .then((responseData) => {
+                console.log(
+                    responseData,
+                    "POST Response",
+                    "Response body -> " + JSON.stringify(responseData))
+                let hash = responseData.hash;
+                console.log(hash);
+                let auth2 = bcrypt.compareSync(this.state.password, hash);
+                console.log(auth2);
+                if(auth2 === true) {
+                    this.auth = true;
+                    this.props.navigation.navigate('MainView');
+                    console.log("yeah")
+                }else {
+                    console.log("Dati login Errati, riprovare");
+                    this.props.navigation.navigate('Login')
+                }
+            }).done();
         } catch(error) {
             this.setState({
                 response: error.toString()
