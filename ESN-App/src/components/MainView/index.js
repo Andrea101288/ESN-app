@@ -1,6 +1,11 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import * as DrawerNavigator from 'react-navigation';
+/* import Events from '../Events';
+import BookedEvents from '../BookedEvents';
+import DeleteAccount from '../DeleteAccount';
+import ChangePassword from '../ChangePassword'; */
+import Logout from '../Logout';
 
 export default class MainView extends React.Component {
 
@@ -13,12 +18,6 @@ export default class MainView extends React.Component {
         this.state = {}
     };
 
-    componentDidMount() {
-        const { currentUser } = this.auth
-        console.log("ciao")
-    }
-
-
     render() {
         return (
             <MyApp screenProps={{ rootNavigation: this.props.navigation }}/>
@@ -28,7 +27,7 @@ export default class MainView extends React.Component {
 
 const MyApp = DrawerNavigator.createDrawerNavigator({
 
-    Events: {
+     /* Events: {
         screen: Events
     },
 
@@ -42,7 +41,7 @@ const MyApp = DrawerNavigator.createDrawerNavigator({
 
     Delete_Account: {
         screen: DeleteAccount
-    },
+    }, */
 
     Logout: {
         screen: Logout

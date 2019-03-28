@@ -12,6 +12,7 @@
     "isaac": "0.0.5",
     "js-base64": "^2.5.1",
     "mysql": "^2.16.0",
+    "native-base": "^2.12.1",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-bcrypt": "^2.4.0",

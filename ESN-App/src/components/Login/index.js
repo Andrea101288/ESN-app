@@ -1,9 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert} from 'react-native';
-import bcrypt from 'react-native-bcrypt'
-
-
-/* import Logout from '../Logout'; */
+import bcrypt from 'react-native-bcrypt';
+import MainView from "../MainView";
 
 export default class Login extends React.Component {
 
@@ -16,7 +14,8 @@ export default class Login extends React.Component {
         this.state = {
             email: '',
             password: '',
-            response: ''
+            response: '',
+            auth: false
         }
         this.Login = this.Login.bind(this)
         this.onButtonPressed = this.onButtonPressed.bind(this)
@@ -24,8 +23,7 @@ export default class Login extends React.Component {
     };
 
     componentDidMount() {
-        if(this.auth)
-            this.props.navigation.navigate(this.auth ? 'MainView' : 'Login')
+        this.props.navigation.navigate('Login')
     }
 
     async Login() {
@@ -47,15 +45,19 @@ export default class Login extends React.Component {
                     "Response body -> " + JSON.stringify(responseData))
                 let hash = responseData.hash;
                 console.log(hash);
-                let auth2 = bcrypt.compareSync(this.state.password, hash);
-                console.log(auth2);
-                if(auth2 === true) {
-                    this.auth = true;
-                    this.props.navigation.navigate('MainView');
-                    console.log("yeah")
-                }else {
-                    console.log("Dati login Errati, riprovare");
-                    this.props.navigation.navigate('Login')
+                if (responseData.status == 200) {
+                    this.state.auth = bcrypt.compareSync(this.state.password, hash);
+                    console.log(this.state.auth);
+                    if (this.state.auth) {
+                        this.props.navigation.navigate('MainView');
+                        console.log("yeah")
+                    } else {
+                        Alert.alert("Error!", "Wrong password. Try again")
+                        this.props.navigation.navigate('Login');
+                    }
+                }else{
+                    Alert.alert("Error!", "Wrong email. Try again")
+                    this.props.navigation.navigate('Login');
                 }
             }).done();
         } catch(error) {
