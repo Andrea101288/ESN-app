@@ -83,29 +83,29 @@ class Events(Resource):
         return {"status": 200, "events": rv}, 200
 
 
-# Init flask
-app = Flask(__name__)
-api = Api(app)
-
-PORT = 8080
-
-# Create new db manager
-manager = Manager(settings.host,
-                  settings.username,
-                  settings.passwd,
-                  settings.database,
-                  settings.charset)
-
-# Routes configuration
-api.add_resource(SignUp, '/signup/')
-api.add_resource(Login, '/login/')
-api.add_resource(Events,
-                 '/events/',
-                 '/events/<offset>/',
-                 '/events/<offset>/<limit>/')
-
-
 if __name__ == '__main__':
+    # Init flask
+    app = Flask(__name__)
+    api = Api(app)
+
+    PORT = 8080
+
+    # Create new db manager
+    manager = Manager(settings.host,
+                      settings.username,
+                      settings.passwd,
+                      settings.database,
+                      settings.charset)
+
+    # Routes configuration
+    api.add_resource(SignUp, '/signup/')
+    api.add_resource(Login, '/login/')
+    api.add_resource(Events,
+                     '/events/',
+                     '/events/<offset>/',
+                     '/events/<offset>/<limit>/')
+
+
     try:
         # Connect to DB
         manager.connect()
