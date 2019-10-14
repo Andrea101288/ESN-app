@@ -1,6 +1,6 @@
 # ESNUrbino-App #
 
-App per ESN Urbino (Erasmus Student Network)
+ESN Urbino app (Erasmus Student Network)
 
-* ESN-App: Codice sorgente del applicazione mobile
-* ESN-Database: Codici e materiale relativo alla parte backend/database
+* ESN-App: source code of the mobile app
+* ESN-Database: backend/database code and material
