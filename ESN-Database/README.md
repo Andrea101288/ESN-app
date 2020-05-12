@@ -1,6 +1,6 @@
 # ESN-Database #
 
-Questa directory raccoglie tutto il materiale riguardante la parte del database.
+This Directory contains files which get data from the ESN urbino and save them into a MySQL database
 
-* getData.py: Effettuta un parsing dei dati sul sito di ESN-Urbino e li inserisce nel database
-* db_skeleton.sql: Scheletro del database
+* getData.py: Data parsing  from ESN urbino site and inserting into Database
+* db_skeleton.sql: Database
